@@ -1,50 +1,69 @@
 const eyebrow = document.getElementById("eyebrow");
 const mainText = document.getElementById("mainText");
-const touchButton = document.getElementById("touchButton");
+const touchArea = document.getElementById("touchArea");
 const touchLabel = document.getElementById("touchLabel");
-const progressArea = document.getElementById("progressArea");
-const progressBar = document.getElementById("progressBar");
-const progressNumber = document.getElementById("progressNumber");
+const orb = document.getElementById("orb");
 const statusList = document.getElementById("statusList");
 const screen = document.getElementById("screen");
 
 let step = 0;
+let busy = false;
 
 const steps = [
   {
-    eyebrow: "Ready",
-    text: "Let's see what we find.",
+    eyebrow: "One more thing...",
+    text: "",
     label: "Tap to begin"
   },
   {
-    eyebrow: "Running a quick scan...",
-    text: "Scanning…",
+    eyebrow: "Initializing...",
+    text: "Getting things ready.",
+    label: "Tap to continue"
+  },
+  {
+    eyebrow: "System check",
+    text: "Running a very serious analysis.",
     label: "Tap to continue"
   },
   {
     eyebrow: "Checking system",
-    text: "Brightness check",
-    label: "Tap to continue"
+    text: "Checking brightness...",
+    label: "Tap to continue",
+    status: "Checking brightness... ✓"
   },
   {
     eyebrow: "Checking system",
-    text: "Mood check",
-    label: "Tap to continue"
+    text: "Checking mood...",
+    label: "Tap to continue",
+    status: "Checking mood... ✓"
   },
   {
     eyebrow: "Checking system",
-    text: "Sunshine level",
-    label: "Tap to continue"
+    text: "Checking energy...",
+    label: "Tap to continue",
+    status: "Checking energy... ✓"
   },
   {
-    eyebrow: "Scan complete",
+    eyebrow: "Final check",
+    text: "Checking sunshine level...",
+    label: "Tap to continue",
+    status: "Checking sunshine level... ✓"
+  },
+  {
+    eyebrow: "Analysis complete",
     text: "Everything looks normal.",
     label: "Tap to see the result"
   },
   {
     eyebrow: "System notice",
-    text: "⚠️ WARNING",
+    text: "Something seems unusual.",
     label: "Tap to continue"
+  },
+  {
+    eyebrow: "System notice",
+    text: "⚠️ WARNING",
+    label: "Tap to continue",
+    warning: true
   },
   {
     eyebrow: "System notice",
@@ -53,32 +72,28 @@ const steps = [
   },
   {
     eyebrow: "Measured result",
-    text: "SUNSHINE LEVEL",
+    text: "SUNSHINE LEVEL:",
     label: "Tap to reveal"
   },
   {
     eyebrow: "Measured result",
     text: "1000% ☀️",
+    label: "Tap to continue",
+    result: true
+  },
+  {
+    eyebrow: "Recommended action",
+    text: "Keep being yourself.",
     label: "Tap to continue"
   },
   {
-    eyebrow: "Unexpected result",
-    text: "SYSTEM ERROR",
-    label: "Tap to continue"
-  },
-  {
-    eyebrow: "Unexpected result",
-    text: "Sunshine level exceeds measurable limits.",
-    label: "Tap to continue"
-  },
-  {
-    eyebrow: "Okay… never mind.",
+    eyebrow: "Final analysis",
     text: "Some things can't be measured. ☀️",
     label: "Tap to continue"
   },
   {
-    eyebrow: "",
-    text: "You're just Sunshine. ☀️",
+    eyebrow: "Anyway...",
+    text: "You're just Sunshine.",
     label: ""
   }
 ];
@@ -87,20 +102,20 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function setText(element, text) {
+function updateText(element, text) {
   element.classList.add("fade-out");
 
   setTimeout(() => {
     element.textContent = text;
     element.classList.remove("fade-out");
     element.classList.add("fade-in");
-  }, 250);
+  }, 280);
 }
 
-function addStatus(text, type = "done") {
+function addStatus(text) {
   const item = document.createElement("div");
 
-  item.className = `status-item ${type}`;
+  item.className = "status-item";
   item.textContent = text;
 
   statusList.appendChild(item);
@@ -110,28 +125,12 @@ function addStatus(text, type = "done") {
   });
 }
 
-function updateProgress() {
-  const percentage = Math.round(
-    (step / (steps.length - 1)) * 100
-  );
+async function showStep(index) {
 
-  progressBar.style.width = `${percentage}%`;
-  progressNumber.textContent = `${percentage}%`;
-}
+  const current = steps[index];
 
-async function goToStep(nextStep) {
-
-  if (nextStep >= steps.length) {
-    finish();
-    return;
-  }
-
-  step = nextStep;
-
-  const current = steps[step];
-
-  mainText.classList.remove("visible");
   eyebrow.classList.add("fade-out");
+  mainText.classList.add("fade-out");
 
   await sleep(300);
 
@@ -139,71 +138,72 @@ async function goToStep(nextStep) {
   mainText.textContent = current.text;
 
   eyebrow.classList.remove("fade-out");
-  mainText.classList.add("visible");
+  mainText.classList.remove("fade-out");
+
+  eyebrow.classList.add("fade-in");
+  mainText.classList.add("fade-in");
 
   touchLabel.textContent = current.label;
 
-  updateProgress();
-
-  if (step === 2) {
-    addStatus("Checking brightness... ✓");
+  if (current.warning) {
+    mainText.classList.add("warning");
+  } else {
+    mainText.classList.remove("warning");
   }
 
-  if (step === 3) {
-    addStatus("Checking mood... ✓");
+  if (current.result) {
+    mainText.classList.add("result-number");
+  } else {
+    mainText.classList.remove("result-number");
   }
 
-  if (step === 4) {
-    addStatus("Checking sunshine level... ✓");
+  if (current.status) {
+    addStatus(current.status);
   }
+}
 
-  if (step >= 5) {
-    progressArea.classList.add("visible");
-  }
+async function nextStep() {
 
-  if (step === 13) {
-    await sleep(900);
+  if (busy) return;
+
+  busy = true;
+
+  step++;
+
+  if (step >= steps.length) {
     finish();
-  }
-}
-
-function finish() {
-
-  screen.classList.add("final");
-
-  touchButton.disabled = true;
-
-  progressArea.classList.add("fade-out");
-  statusList.classList.add("fade-out");
-
-  setTimeout(() => {
-    touchButton.classList.add("hidden");
-
-    mainText.classList.remove("fade-out");
-    mainText.classList.add("visible");
-
-    eyebrow.textContent = "";
-    mainText.textContent = "You're just Sunshine. ☀️";
-
-    progressBar.style.width = "100%";
-    progressNumber.textContent = "100%";
-  }, 600);
-}
-
-touchButton.addEventListener("click", async () => {
-
-  if (step >= steps.length - 1) {
     return;
   }
 
-  touchButton.disabled = true;
+  await showStep(step);
 
-  await goToStep(step + 1);
+  await sleep(500);
 
-  setTimeout(() => {
-    touchButton.disabled = false;
-  }, 450);
-});
+  busy = false;
+}
+
+async function finish() {
+
+  screen.classList.add("final-state");
+
+  touchArea.disabled = true;
+
+  await sleep(900);
+
+  eyebrow.textContent = "";
+
+  mainText.classList.remove("fade-out");
+
+  mainText.textContent = "You're just Sunshine.";
+
+  mainText.classList.add("fade-in");
+
+  touchLabel.textContent = "";
+}
+
+touchArea.addEventListener("click", nextStep);
+
+/* Initial state */
 
 mainText.textContent = "";
-progressArea.classList.remove("visible");
+touchLabel.textContent = "Tap to begin";
