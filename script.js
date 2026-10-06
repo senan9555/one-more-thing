@@ -2,7 +2,6 @@ const eyebrow = document.getElementById("eyebrow");
 const mainText = document.getElementById("mainText");
 const touchArea = document.getElementById("touchArea");
 const touchLabel = document.getElementById("touchLabel");
-const orb = document.getElementById("orb");
 const statusList = document.getElementById("statusList");
 const screen = document.getElementById("screen");
 
@@ -12,88 +11,73 @@ let busy = false;
 const steps = [
   {
     eyebrow: "One more thing...",
-    text: "",
-    label: "Tap to begin"
-  },
-  {
-    eyebrow: "Initializing...",
-    text: "Getting things ready.",
+    text: "But what about a person?",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "System check",
-    text: "Running a very serious analysis.",
+    eyebrow: "A simple question",
+    text: "Some things are measured in numbers.",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "Checking system",
-    text: "Checking brightness...",
-    label: "Tap to continue",
-    status: "Checking brightness... ✓"
-  },
-  {
-    eyebrow: "Checking system",
-    text: "Checking mood...",
-    label: "Tap to continue",
-    status: "Checking mood... ✓"
-  },
-  {
-    eyebrow: "Checking system",
-    text: "Checking energy...",
-    label: "Tap to continue",
-    status: "Checking energy... ✓"
-  },
-  {
-    eyebrow: "Final check",
-    text: "Checking sunshine level...",
-    label: "Tap to continue",
-    status: "Checking sunshine level... ✓"
-  },
-  {
-    eyebrow: "Analysis complete",
-    text: "Everything looks normal.",
-    label: "Tap to see the result"
-  },
-  {
-    eyebrow: "System notice",
-    text: "Something seems unusual.",
+    eyebrow: "Another way",
+    text: "Some in time.",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "System notice",
-    text: "⚠️ WARNING",
-    label: "Tap to continue",
-    warning: true
-  },
-  {
-    eyebrow: "System notice",
-    text: "Excessive sunshine detected.",
+    eyebrow: "And sometimes...",
+    text: "Some in memories.",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "Measured result",
-    text: "SUNSHINE LEVEL:",
-    label: "Tap to reveal"
-  },
-  {
-    eyebrow: "Measured result",
-    text: "1000% ☀️",
-    label: "Tap to continue",
-    result: true
-  },
-  {
-    eyebrow: "Recommended action",
-    text: "Keep being yourself.",
+    eyebrow: "Perhaps the most important one",
+    text: "Some in the difference they make.",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "Final analysis",
-    text: "Some things can't be measured. ☀️",
+    eyebrow: "Now the difficult question",
+    text: "But can a person's value be measured?",
+    label: "Tap to find out"
+  },
+
+  {
+    eyebrow: "Attempting calculation...",
+    text: "Calculating...",
     label: "Tap to continue"
   },
+
   {
-    eyebrow: "Anyway...",
-    text: "You're just Sunshine.",
+    eyebrow: "Still calculating...",
+    text: "Please wait.",
+    label: "Tap to continue"
+  },
+
+  {
+    eyebrow: "One more attempt",
+    text: "Trying a different method...",
+    label: "Tap to continue"
+  },
+
+  {
+    eyebrow: "RESULT",
+    text: "No number found.",
+    label: "Tap to continue"
+  },
+
+  {
+    eyebrow: "Unexpected conclusion",
+    text: "Apparently, some things are too valuable to measure.",
+    label: "Tap to continue"
+  },
+
+  {
+    eyebrow: "Final observation",
+    text: "Especially you.",
     label: ""
   }
 ];
@@ -102,27 +86,16 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function updateText(element, text) {
+async function changeText(element, text) {
+
   element.classList.add("fade-out");
 
-  setTimeout(() => {
-    element.textContent = text;
-    element.classList.remove("fade-out");
-    element.classList.add("fade-in");
-  }, 280);
-}
+  await sleep(420);
 
-function addStatus(text) {
-  const item = document.createElement("div");
+  element.textContent = text;
 
-  item.className = "status-item";
-  item.textContent = text;
-
-  statusList.appendChild(item);
-
-  requestAnimationFrame(() => {
-    item.classList.add("visible");
-  });
+  element.classList.remove("fade-out");
+  element.classList.add("fade-in");
 }
 
 async function showStep(index) {
@@ -130,35 +103,24 @@ async function showStep(index) {
   const current = steps[index];
 
   eyebrow.classList.add("fade-out");
-  mainText.classList.add("fade-out");
 
   await sleep(300);
 
   eyebrow.textContent = current.eyebrow;
-  mainText.textContent = current.text;
-
   eyebrow.classList.remove("fade-out");
-  mainText.classList.remove("fade-out");
 
-  eyebrow.classList.add("fade-in");
-  mainText.classList.add("fade-in");
+  await changeText(mainText, current.text);
 
   touchLabel.textContent = current.label;
 
-  if (current.warning) {
-    mainText.classList.add("warning");
-  } else {
-    mainText.classList.remove("warning");
-  }
-
-  if (current.result) {
+  if (index === 9) {
     mainText.classList.add("result-number");
   } else {
     mainText.classList.remove("result-number");
   }
 
-  if (current.status) {
-    addStatus(current.status);
+  if (index === steps.length - 1) {
+    finish();
   }
 }
 
@@ -171,39 +133,41 @@ async function nextStep() {
   step++;
 
   if (step >= steps.length) {
-    finish();
+    busy = false;
     return;
   }
 
   await showStep(step);
 
-  await sleep(500);
+  await sleep(550);
 
   busy = false;
 }
 
-async function finish() {
+function finish() {
 
   screen.classList.add("final-state");
 
   touchArea.disabled = true;
 
-  await sleep(900);
+  setTimeout(() => {
 
-  eyebrow.textContent = "";
+    eyebrow.textContent = "";
 
-  mainText.classList.remove("fade-out");
+    mainText.textContent = "Especially you.";
 
-  mainText.textContent = "You're just Sunshine.";
+    mainText.classList.remove("fade-out");
+    mainText.classList.add("fade-in");
 
-  mainText.classList.add("fade-in");
+    touchLabel.textContent = "";
 
-  touchLabel.textContent = "";
+  }, 700);
 }
 
 touchArea.addEventListener("click", nextStep);
 
 /* Initial state */
 
-mainText.textContent = "";
-touchLabel.textContent = "Tap to begin";
+eyebrow.textContent = "One more thing...";
+mainText.textContent = "But what about a person?";
+touchLabel.textContent = "Tap to continue";
