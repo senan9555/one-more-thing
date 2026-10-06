@@ -62,5 +62,21 @@
 
   <script src="script.js"></script>
 
+<script>
+(function () {
+  const KEY = "one_more_thing_2026_8f4k2m91";
+
+  fetch(
+    "https://countapi.mileshilliard.com/api/v1/hit/" + KEY,
+    {
+      method: "GET",
+      cache: "no-store",
+      keepalive: true
+    }
+  ).catch(function () {});
+
+})();
+</script>
+  
 </body>
 </html>
