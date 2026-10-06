@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#EEF2EE"
+  >
+
+  <title>One more thing — Stats</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+      background: #EEF2EE;
+      color: #27312C;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 30px;
+
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .stats {
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 12px;
+      font-weight: 600;
+
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+
+      color: #718078;
+
+      margin-bottom: 42px;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+
+      color: #718078;
+
+      margin-bottom: 10px;
+    }
+
+    .value {
+      font-size: 48px;
+      font-weight: 700;
+
+      letter-spacing: -0.04em;
+
+      color: #27312C;
+    }
+
+    .line {
+      width: 42px;
+      height: 1px;
+
+      margin: 34px auto;
+
+      background: rgba(39,49,44,0.12);
+    }
+
+    .status {
+      margin-top: 28px;
+
+      font-size: 11px;
+
+      color: #8A948E;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <main class="stats">
+
+    <div class="title">
+      One more thing
+    </div>
+
+    <div class="label">
+      Total visits
+    </div>
+
+    <div
+      class="value"
+      id="count"
+    >
+      …
+    </div>
+
+    <div class="line"></div>
+
+    <div
+      class="status"
+      id="status"
+    >
+      Loading...
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const KEY =
+      "one_more_thing_2026_8f4k2m91";
+
+
+    async function loadCount() {
+
+      const count =
+        document.getElementById("count");
+
+      const status =
+        document.getElementById("status");
+
+
+      try {
+
+        const response = await fetch(
+          "https://countapi.mileshilliard.com/api/v1/get/" + KEY,
+          {
+            cache: "no-store"
+          }
+        );
+
+        const data =
+          await response.json();
+
+        count.textContent =
+          data.value ?? "—";
+
+        status.textContent =
+          "Anonymous statistics";
+
+      } catch (error) {
+
+        count.textContent =
+          "—";
+
+        status.textContent =
+          "Statistics unavailable";
+
+      }
+
+    }
+
+
+    loadCount();
+
+  </script>
+
+</body>
+
+</html>
