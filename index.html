@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
 
   <meta name="theme-color" content="#F8F5EE">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,33 +28,32 @@
           One more thing...
         </div>
 
-        <button class="touch-button" id="touchButton" aria-label="Continue">
+        <div class="main-text" id="mainText">
+          Tap to begin
+        </div>
 
-          <div class="orb">
-            <div class="orb-inner"></div>
+        <button
+          class="touch-area"
+          id="touchArea"
+          aria-label="Continue"
+        >
+
+          <div class="orb" id="orb">
+            <div class="orb-glow"></div>
+            <div class="orb-core"></div>
           </div>
 
-          <span class="touch-label" id="touchLabel">
-            Tap to continue
-          </span>
+          <div class="touch-label" id="touchLabel">
+            Tap to begin
+          </div>
 
         </button>
 
-        <div class="main-text" id="mainText"></div>
+        <div class="status-area" id="statusArea">
 
-        <div class="progress-area" id="progressArea">
-
-          <div class="progress-track">
-            <div class="progress-bar" id="progressBar"></div>
-          </div>
-
-          <div class="progress-number" id="progressNumber">
-            0%
-          </div>
+          <div class="status-list" id="statusList"></div>
 
         </div>
-
-        <div class="status-list" id="statusList"></div>
 
       </div>
 
